@@ -8,6 +8,9 @@ from gameobject import *
 pygame.init()
 pygame.mixer.init()
 pygame.font.init()
+pygame.mixer.music.load("sounds/bgm.mp3")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(999)
 
 class Ready(object):
     # 准备界面
@@ -75,6 +78,8 @@ class Dodge(object):
         for i in range(0, 8):
             self.questionlist.append(self.__getrandomitems__()) # 初始化物品位置，填满所有格子
         self.correctnum = 0
+        self.questionsum = 0 # 一共做了多少题
+        self.questionnum = 0 # 一共做对了多少题
         self.wrongproperty = 0 # 如答错持续显示错号0.5秒钟，并在此期间无法作答
         self.start_wrongtime = 0
         self.end_wrongtime = 0
@@ -86,6 +91,13 @@ class Dodge(object):
     def __createroles__(self):
         self.player = Player("images/umbrella.png").image
         self.itemlist = [Item(0), Item(1), Item(2)] # 0 空地 1 水滴 2 闪电
+
+        self.start_sound = pygame.mixer.Sound("sounds/start.mp3")
+        self.start_sound.set_volume(0.3)
+        self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
+        self.correct_sound.set_volume(0.4)
+        self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
+        self.wrong_sound.set_volume(0.1)
         
     def __createfonts__(self):
         self.text1 = self.font.render("游戏时间：", True, "black")
@@ -97,6 +109,7 @@ class Dodge(object):
         return self.itempos[index]
         
     def startGame(self):
+        self.start_sound.play()
         while True:
             self.clock.tick(60)
             self.__eventhandler__()
@@ -117,13 +130,24 @@ class Dodge(object):
                         elif event.key == pygame.K_RIGHT:
                             self.playerpos = 1       
                         
+                        self.questionsum += 1
+
+                        self.start_sound.stop()
+                        self.correct_sound.stop()
+                        self.wrong_sound.stop()
+
                         if self.questionlist[0][self.playerpos] == 0:
                             self.correctnum += 1
+                            self.questionnum += 1
+                            self.correct_sound.play()
                         elif self.questionlist[0][self.playerpos] == 1:
                             self.correctnum += 5
+                            self.questionnum += 1
+                            self.correct_sound.play()
                         elif self.questionlist[0][self.playerpos] == 2:
                             self.correctnum -= 10 # 答案判断 空地加1分；水滴加5分；闪电减10分
                             self.wrongproperty = 1
+                            self.wrong_sound.play()
                             self.start_wrongtime = time.time()
                         if self.wrongproperty == 0:
                             self.questionlist.pop(0)
@@ -135,13 +159,15 @@ class Dodge(object):
         self.__drawblocks__()
         self.screen.blit(self.player, (self.playerpos * 80 + 350, 690))
         self.__drawitems__()
-        self.end_gametime = time.time()
-        
         # 如答错持续显示错号0.5秒钟，并在此期间无法作答
         if self.wrongproperty == 1:
             self.__drawwrong__()
             
         self.__drawboard__()
+        self.end_gametime = time.time()
+        if self.end_gametime - self.start_gametime >= self.sum_gametime:
+            result = Result(self.questionsum, self.questionnum, self.correctnum)
+            result.startGame()
         
     def __drawblocks__(self):
         # 一共画9*2共18个格子
@@ -181,7 +207,53 @@ class Dodge(object):
         self.screen.blit(self.text2, textrect2)
         self.screen.blit(self.text_gametime, textrect3)
         self.screen.blit(self.text_correctnum, textrect4)
-        
+
+class Result(object):
+    # 显示结果
+    def __init__(self, sum, correctnum, score):
+        super().__init__()
+        self.screen = pygame.display.set_mode((1200, 700))
+        self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 48)
+        self.sum = sum
+        self.correctnum = correctnum
+        self.score = score
+
+    def startGame(self):
+        while True:
+            self.__eventhandler__()
+            self.__update__()
+            pygame.display.flip()
+
+    def __eventhandler__(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pressedArr = pygame.mouse.get_pressed()
+                for index in range(len(pressedArr)):
+                    if index == 0 and pressedArr[index]:
+                        pos = pygame.mouse.get_pos()
+                        posX = pos[0]
+                        posY = pos[1]
+                        if posX > 500 and posX < 700 and posY > 450 and posY < 550:
+                            ready = Ready()
+                            ready.startGame()
+
+    def __update__(self):
+        self.screen.fill("#808080")
+        text1 = self.font.render("任务完成", True, (0, 0, 0))
+        text2 = self.font.render("你的正确题数：" + str(self.correctnum) + "   正确率：" + str(round(self.correctnum / self.sum * 100, 2)) + "%", True, (0, 0, 0))
+        text3 = self.font.render("你的得分："+ str(self.score * 10), True, (0, 0, 0))
+        self.screen.blit(text1, (150, 150))
+        self.screen.blit(text2, (150, 250))
+        self.screen.blit(text3, (150, 350))
+        self.screen.blit(pygame.image.load("images/restart.png").convert_alpha(), (500, 450))
+
+def main():
+    ready = Ready()
+    ready.startGame()
+
 if __name__ == "__main__":
-    dodge = Dodge()
-    dodge.startGame()
+    main()
