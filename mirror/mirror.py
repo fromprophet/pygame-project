@@ -23,7 +23,7 @@ class Mirror(object):
         self.memory = Memory(self.screen, self.chessboard_index, self.mirrorcount, self.randommirrorpos)
         self.select = Select(self.screen, self.chessboard_index, self.randommirrorpos)
         self.showresult = Showresult(self.screen, self.chessboard_index, self.randommirrorpos, self.memory.reflectlist, self.select.buttonlist, [], self.select.buttonGroup, self.select.flashGroup)
-        self.playeranswer = [] # 如用户点击了按钮，保存结果[方向，个数]
+        # self.playeranswer = [] # 如用户点击了按钮，保存结果[方向，个数]
         
     def startGame(self):
         while True:
@@ -42,7 +42,8 @@ class Mirror(object):
                 self.memory.eventhandler(event)
             elif self.mode == "select":
                 self.select.eventhandler(event)
-                self.playeranswer = self.select.playeranswer
+                # self.playeranswer = self.select.playeranswer
+                self.showresult.playeranswer = self.select.playeranswer
         if self.memory.mode == "select":
             self.mode = "select"
         if self.select.mode == "showresult":

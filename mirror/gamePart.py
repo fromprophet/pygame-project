@@ -201,6 +201,8 @@ class Showresult(object):
         self.playeranswer = playeranswer
         self.buttonGroup = buttonGroup
         self.flashGroup = flashGroup
+        self.realanswer = [] # 最后得到的实际的答案
+        self.playerflag = 0 # 最后作答是否正确。0：未作答 1：正确 2：错误
         
         self.__createbasicroles__()
         
@@ -309,9 +311,20 @@ class Showresult(object):
             
         pygame.draw.lines(self.screen, 'black', False, self.lightpointlist, width = 1) # 用drawlines画光线
         
+        # print(self.playerflag)
+        
+        if self.playerflag == 1:
+            self.screen.blit(pygame.transform.scale(pygame.image.load("images/right.png").convert_alpha(), (150, 110)), (410, 560))
+        elif self.playerflag == 2:
+            self.screen.blit(pygame.transform.scale(pygame.image.load("images/wrong.png").convert_alpha(), (150, 110)), (410, 560))
+        
     def __lightcollide__(self):
         # 光线和按钮碰撞检测
         collision = pygame.sprite.groupcollide(self.lightGroup, self.buttonGroup, True, False) # 后两个bool值分别表示这两个精灵组如发生碰撞是否删除
         for button_sprite in collision.values():
-            print(button_sprite[0].indexposition)
-        
+            self.realanswer = button_sprite[0].indexposition
+            if self.playerflag == 0 and len(self.realanswer) != 0 and len(self.playeranswer) != 0:
+                if self.realanswer == self.playeranswer:
+                    self.playerflag = 1
+                else:
+                    self.playerflag = 2
