@@ -16,7 +16,7 @@ class Mirror(object):
         self.chessboard_index = 5 # 控制产生几*几的棋盘
         
         self.mirrorcount = random.randint(5, 10)
-        self.randommirrorpos = random.sample([i for i in range(0, self.chessboard_index ** 2)], self.mirrorcount) # 随机位置 得到下标列表
+        self.randommirrorpos = random.sample([i for i in range(0, self.chessboard_index ** 2)], self.mirrorcount) # 随机镜子位置 得到下标列表
         self.__createbasicroles__()
         
         self.randbuttonindexX, self.randbuttonindexY = self.__setbuttonindex__()
