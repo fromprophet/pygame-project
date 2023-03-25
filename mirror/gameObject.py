@@ -1,5 +1,4 @@
 import pygame
-import random
 
 class ChessBoard(object):
     # 棋盘

@@ -1,4 +1,6 @@
 import pygame
+import time
+import random
 from gameObject import *
 
 # 保存单题游戏的三个阶段：记忆阶段、选择阶段、展示结果阶段。
@@ -7,9 +9,10 @@ class Memory(object):
     # 记忆阶段
     def __init__(self, screen, chessboard_index, mirrorcount, randommirrorpos):
         super().__init__()
-        pygame.font.init()
         self.screen = screen
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 36)
+        self.mouse_sound = pygame.mixer.Sound("sounds/mouse.mp3")
+        self.mouse_sound.set_volume(0.8)
         self.mode = "memory" # 控制单题游戏阶段。memory记忆阶段 select选择做题阶段 showresult展示结果阶段
         self.chessboard_index = chessboard_index # 控制产生几*几的棋盘
         self.mirrorcount =  mirrorcount # 随机镜子个数
@@ -41,6 +44,7 @@ class Memory(object):
                     keyposx = keypos[0]
                     keyposy = keypos[1]
                     if keyposx > 350 and keyposx < 550 and keyposy > 680 and keyposy < 780:
+                        self.mouse_sound.play()
                         self.mode = "select"
     
     def updateroles(self):
@@ -61,6 +65,8 @@ class Select(object):
         super().__init__()
         self.screen = screen
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 36)
+        self.mouse_sound = pygame.mixer.Sound("sounds/mouse.mp3")
+        self.mouse_sound.set_volume(0.8)
         self.mode = "select" # 控制单题游戏阶段。memory记忆阶段 select选择做题阶段 showresult展示结果阶段
         self.chessboard_index = chessboard_index
         self.randommirrorpos = randommirrorpos
@@ -93,6 +99,7 @@ class Select(object):
         while flag == True:
             randbuttonindexX = random.randint(0, 3)
             randbuttonindexY = random.randint(0, self.chessboard_index - 1)
+            flag = self.__judgebuttonindex__(randbuttonindexX, randbuttonindexY)
         return randbuttonindexX, randbuttonindexY
     
     def __judgebuttonindex__(self, x, y):
@@ -157,6 +164,7 @@ class Select(object):
                         self.playeranswer = []
                     elif temp != None:
                         self.playeranswer = temp.indexposition # 得到用户答案
+                        self.mouse_sound.play()
                         self.mode = "showresult"
     
     def __get_button_index__(self, x, y):
@@ -193,7 +201,12 @@ class Showresult(object):
         super().__init__()
         self.screen = screen
         self.mode = "select" # 控制单题游戏阶段。memory记忆阶段 select选择做题阶段 showresult展示结果阶段
+        self.changemodeflag = False # 控制是否需要切到下一题
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 36)
+        self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
+        self.correct_sound.set_volume(0.4)
+        self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
+        self.wrong_sound.set_volume(0.1)
         self.chessboard_index = chessboard_index
         self.randommirrorpos = randommirrorpos
         self.reflectlist = reflectlist
@@ -203,6 +216,9 @@ class Showresult(object):
         self.flashGroup = flashGroup
         self.realanswer = [] # 最后得到的实际的答案
         self.playerflag = 0 # 最后作答是否正确。0：未作答 1：正确 2：错误
+
+        self.start_property_time = 0 # 控制显示对勾和叉号的时间
+        self.end_property_time = 0
         
         self.__createbasicroles__()
         
@@ -216,9 +232,6 @@ class Showresult(object):
         self.descriptionrect = self.descriptionfont.get_rect()
         self.descriptionrect.centerx = 450
         self.descriptionrect.centery = 30
-        
-        # for i in range(len(self.buttonGroup.sprites())):
-        #     self.buttonGroup.sprites()[i].visible = False
         
     def __createlight__(self):
         # 创建光束及找到初始位置
@@ -311,12 +324,16 @@ class Showresult(object):
             
         pygame.draw.lines(self.screen, 'black', False, self.lightpointlist, width = 1) # 用drawlines画光线
         
-        # print(self.playerflag)
-        
-        if self.playerflag == 1:
-            self.screen.blit(pygame.transform.scale(pygame.image.load("images/right.png").convert_alpha(), (150, 110)), (410, 560))
-        elif self.playerflag == 2:
-            self.screen.blit(pygame.transform.scale(pygame.image.load("images/wrong.png").convert_alpha(), (150, 110)), (410, 560))
+        if self.playerflag != 0:
+            self.end_property_time = time.time()
+            if self.end_property_time - self.start_property_time < 1.0:
+                if self.playerflag == 1:
+                    self.screen.blit(pygame.transform.scale(pygame.image.load("images/right.png").convert_alpha(), (150, 110)), (410, 560))
+                elif self.playerflag == 2:
+                    self.screen.blit(pygame.transform.scale(pygame.image.load("images/wrong.png").convert_alpha(), (150, 110)), (410, 560))
+            else:
+                self.mode = "memory"
+                self.changemodeflag = True # 切到下一题
         
     def __lightcollide__(self):
         # 光线和按钮碰撞检测
@@ -324,7 +341,10 @@ class Showresult(object):
         for button_sprite in collision.values():
             self.realanswer = button_sprite[0].indexposition
             if self.playerflag == 0 and len(self.realanswer) != 0 and len(self.playeranswer) != 0:
+                self.start_property_time = time.time()
                 if self.realanswer == self.playeranswer:
                     self.playerflag = 1
+                    self.correct_sound.play()
                 else:
                     self.playerflag = 2
+                    self.wrong_sound.play()
