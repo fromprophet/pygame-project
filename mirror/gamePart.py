@@ -214,6 +214,13 @@ class Showresult(object):
         self.playeranswer = playeranswer
         self.buttonGroup = buttonGroup
         self.flashGroup = flashGroup
+
+        self.tempGroup = pygame.sprite.Group() # 把按钮和手电筒放一起（有可能出射点是手电筒）
+        for i in range(len(self.buttonGroup.sprites())):
+            self.tempGroup.add(self.buttonGroup.sprites()[i])
+        for i in range(len(self.flashGroup.sprites())):
+            self.tempGroup.add(self.flashGroup.sprites()[i])
+
         self.realanswer = [] # 最后得到的实际的答案
         self.playerflag = 0 # 最后作答是否正确。0：未作答 1：正确 2：错误
 
@@ -244,15 +251,15 @@ class Showresult(object):
                     break
         if self.light.index == 0:
             self.light.rect.centerx = rect.centerx
-            self.light.rect.centery = rect.centery + 50
+            self.light.rect.centery = rect.centery + 60
         elif self.light.index == 1:
             self.light.rect.centerx = rect.centerx
-            self.light.rect.centery = rect.centery - 50
+            self.light.rect.centery = rect.centery - 60
         elif self.light.index == 2:
-            self.light.rect.centerx = rect.centerx + 50
+            self.light.rect.centerx = rect.centerx + 60
             self.light.rect.centery = rect.centery
         elif self.light.index == 3:
-            self.light.rect.centerx = rect.centerx - 50
+            self.light.rect.centerx = rect.centerx - 60
             self.light.rect.centery = rect.centery
             
         self.lightGroup.add(self.light)
@@ -286,7 +293,7 @@ class Showresult(object):
             self.lightpointlist.pop(-1)
             self.lightpointlist.append([self.light.rect.centerx, self.light.rect.centery])
         # 首先找到光在哪个格子里
-        self.lightpos = ((self.light.rect.centery - ((800 - 100 * self.chessboard_index) / 2)) // 100) * self.chessboard_index + ((self.light.rect.centerx - ((900 - 100 * self.chessboard_index) / 2)) // 100)
+        self.lightpos = int(((self.light.rect.centery - ((800 - 100 * self.chessboard_index) / 2)) // 100) * self.chessboard_index + ((self.light.rect.centerx - ((900 - 100 * self.chessboard_index) / 2)) // 100))
         # 接下来把光和镜子中心点进行判断
         if self.lightpos in self.randommirrorpos:
             # （1）如果碰到了镜子，需要找到镜子的下标
@@ -337,7 +344,7 @@ class Showresult(object):
         
     def __lightcollide__(self):
         # 光线和按钮碰撞检测
-        collision = pygame.sprite.groupcollide(self.lightGroup, self.buttonGroup, True, False) # 后两个bool值分别表示这两个精灵组如发生碰撞是否删除
+        collision = pygame.sprite.groupcollide(self.lightGroup, self.tempGroup, True, False) # 后两个bool值分别表示这两个精灵组如发生碰撞是否删除
         for button_sprite in collision.values():
             self.realanswer = button_sprite[0].indexposition
             if self.playerflag == 0 and len(self.realanswer) != 0 and len(self.playeranswer) != 0:

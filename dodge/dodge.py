@@ -17,6 +17,7 @@ class Ready(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 800))
+        pygame.display.set_caption("闪电躲避")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 72)
         self.description = Board("images/description.png").image
         self.gametime = 3
@@ -69,6 +70,7 @@ class Dodge(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode(((1200, 800)))
+        pygame.display.set_caption("闪电躲避")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 36)
         self.__createroles__()
@@ -96,6 +98,8 @@ class Dodge(object):
         self.start_sound.set_volume(0.3)
         self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
         self.correct_sound.set_volume(0.4)
+        self.waterdrop_sound = pygame.mixer.Sound("sounds/waterdrop.mp3")
+        self.waterdrop_sound.set_volume(1.5)
         self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
         self.wrong_sound.set_volume(0.1)
         
@@ -143,7 +147,7 @@ class Dodge(object):
                         elif self.questionlist[0][self.playerpos] == 1:
                             self.correctnum += 5
                             self.questionnum += 1
-                            self.correct_sound.play()
+                            self.waterdrop_sound.play()
                         elif self.questionlist[0][self.playerpos] == 2:
                             self.correctnum -= 10 # 答案判断 空地加1分；水滴加5分；闪电减10分
                             self.wrongproperty = 1
@@ -213,6 +217,7 @@ class Result(object):
     def __init__(self, sum, correctnum, score):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("闪电躲避")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 48)
         self.sum = sum
         self.correctnum = correctnum

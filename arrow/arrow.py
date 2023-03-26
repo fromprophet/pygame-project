@@ -17,6 +17,7 @@ class Ready(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("方向判断")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 72)
         self.description = Board("images/description.png").image
         self.gametime = 3
@@ -69,6 +70,7 @@ class Arrow():
     # 游戏界面
     def __init__(self):
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("方向判断")
         self.clock = pygame.time.Clock()
         self.question_sum = 10 # 题目总数
         self.question_num = 1 # 已做到第几题
@@ -198,6 +200,7 @@ class Result(object):
     def __init__(self, sum, correctnum, arrange):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("方向判断")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 48)
         self.sum = sum
         self.correctnum = correctnum

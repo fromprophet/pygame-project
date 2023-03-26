@@ -18,6 +18,7 @@ class Ready(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 800))
+        pygame.display.set_caption("镜面记忆")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 72)
         self.gametime = 3
         self.colorlist = [['#0000FF', '#FFFF00'], ['#00FF00', '#0000FF'], ['#FF0000', '#00FF00'], ['#000000', '#808080']]
@@ -68,6 +69,7 @@ class Mirror(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 800))
+        pygame.display.set_caption("镜面记忆")
         self.time = pygame.time.Clock()
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 36)
         self.chessboard_index = 5 # 控制产生几*几的棋盘
@@ -158,6 +160,7 @@ class Result(object):
     def __init__(self, sum, correctnum):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 800))
+        pygame.display.set_caption("镜面记忆")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 48)
         self.sum = sum
         self.correctnum = correctnum

@@ -17,6 +17,7 @@ class Ready(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("猜拳")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 72)
         self.description = Board("images/description.png").image
         self.gametime = 3
@@ -70,6 +71,7 @@ class Finger(object):
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("猜拳")
         self.clock = pygame.time.Clock()
         self.__createroles__()
         self.questionsum = 10 # 一共多少题
@@ -216,6 +218,7 @@ class Result(object):
     def __init__(self, sum, correctnum, arrange):
         super().__init__()
         self.screen = pygame.display.set_mode((1200, 700))
+        pygame.display.set_caption("猜拳")
         self.font = pygame.font.Font("fonts/国潮招牌字体.ttf", 48)
         self.sum = sum
         self.correctnum = correctnum
