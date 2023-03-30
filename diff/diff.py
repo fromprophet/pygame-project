@@ -8,6 +8,9 @@ from gameObject import *
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
+pygame.mixer.music.load("sounds/bgm.mp3")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(999)
 
 class DiffReady(object):
     # 准备界面
@@ -75,6 +78,16 @@ class Diff(object):
         self.hoverindex = 0 # hover的图片（0未hover 1左 2右）
         self.hovercube = [] # hover的魔方下标
         self.iscomplete = 0 # 1已通关 2未通关
+
+        self.start_sound = pygame.mixer.Sound("sounds/start.mp3")
+        self.start_sound.set_volume(0.3)
+        self.mouse_sound = pygame.mixer.Sound("sounds/mouse.mp3")
+        self.mouse_sound.set_volume(0.8)
+        self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
+        self.correct_sound.set_volume(0.4)
+        self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
+        self.wrong_sound.set_volume(0.1)
+
         self.__setcube__()
         
     def __setcube__(self):
@@ -119,6 +132,7 @@ class Diff(object):
             return self.__randcolor__(color)
         
     def startGame(self):
+        self.start_sound.play()
         while True:
             self.clock.tick(60)
             self.__eventhanlder__()
@@ -147,8 +161,10 @@ class Diff(object):
                         if keypos[0] > 550 and keypos[0] < 710 and keypos[1] > 700 and keypos[1] < 780:
                             if self.clickmode == "nextlevel":
                                 self.level += 1
+                                self.mouse_sound.play()
                                 self.__setcube__() # 重新出题
                             elif self.clickmode == "result":
+                                self.mouse_sound.play()
                                 result = Result(self.level, self.iscomplete)
                                 result.startGame()
                         else:
@@ -158,9 +174,13 @@ class Diff(object):
                             elif keyindex == 0:
                                 self.keycube = []
                             if keyindex != 0 and len(self.keycube) != 0:
+                                    if self.start_sound.play():
+                                        self.start_sound.stop()
                                     if self.keycube == [self.randx, self.randy]:
+                                        self.correct_sound.play()
                                         self.temp_property = 1
                                     else:
+                                        self.wrong_sound.play()
                                         self.temp_property = 2
                                     
     def __gethoverindex__(self, x, y):

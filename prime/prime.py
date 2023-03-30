@@ -8,6 +8,9 @@ from gameObject import *
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
+bgm = pygame.mixer.music.load("sounds/bgm.mp3")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(999)
 
 class PrimeReady(object):
     # 准备界面
@@ -72,6 +75,13 @@ class Prime(object):
         self.__createitems__()
 
         self.correctnum = 0
+
+        self.start_sound = pygame.mixer.Sound("sounds/start.mp3")
+        self.start_sound.set_volume(0.3)
+        self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
+        self.correct_sound.set_volume(0.4)
+        self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
+        self.wrong_sound.set_volume(0.1)
         
 
     def __createitems__(self):
@@ -145,6 +155,7 @@ class Prime(object):
             self.temp_number_list.append(NumberFont(temp_numlist[i], property, i, self.chessboard_index))
 
     def startGame(self):
+        self.start_sound.play()
         while True:
             self.clock.tick(60)
             self.__eventhandler__()
@@ -175,12 +186,16 @@ class Prime(object):
                         keyindex = self.__getmouseindex__(keypos[0], keypos[1])
                         if keyindex != None:
                             if self.temp_property == 0:
+                                if self.start_sound.play():
+                                    self.start_sound.stop()
                                 if keyindex == self.temp_answer_pos:
                                     self.temp_property = 1
+                                    self.correct_sound.play()
                                     self.end_answer_time = time.time()
                                     self.answer_time_list.append(self.end_answer_time - self.start_answer_time)
                                 else:
                                     self.temp_property = 2
+                                    self.wrong_sound.play()
                                 self.start_property_time = time.time()                           
     
     def __getmouseindex__(self, x, y):

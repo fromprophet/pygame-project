@@ -9,6 +9,9 @@ from gamePart import *
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
+bgm = pygame.mixer.music.load("sounds/bgm.mp3")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(999)
 
 class GenieReady(object):
     # 准备界面
@@ -73,6 +76,10 @@ class Genie(object):
         self.property_list = ["黄色", "棕色", "蓝色", "红色", "绿色"]
 
         self.mode = "memory" # 控制做题阶段。 memory：记忆阶段 select：选择阶段
+
+        self.start_sound = pygame.mixer.Sound("sounds/start.mp3")
+        self.start_sound.set_volume(0.3)
+
         self.__createroles__()
         
     def __createroles__(self):
@@ -132,6 +139,7 @@ class Genie(object):
                 
         
     def startGame(self):
+        self.start_sound.play()
         while True:
             self.clock.tick(60)
             self.__eventhandler__()

@@ -16,6 +16,9 @@ class Memory(object):
         self.descriptionrect = self.descriptionfont.get_rect()
         self.descriptionrect.centerx = 450
         self.descriptionrect.centery = 100
+
+        self.mouse_sound = pygame.mixer.Sound("sounds/mouse.mp3")
+        self.mouse_sound.set_volume(0.8)
         
         self.start_countdown = time.time() # 倒计时
         self.end_countdown = time.time()
@@ -31,6 +34,7 @@ class Memory(object):
                     if keyposx > 370 and keyposx < 530 and keyposy > 580 and keyposy < 660:
                         self.start_countdown = 0
                         self.end_countdown = 0 # 停止倒计时
+                        self.mouse_sound.play()
                         self.mode = "select"
     
     def update(self):
@@ -88,6 +92,13 @@ class Select(object):
         self.clickmode = "none" # 存储点击按钮情况 none无按钮 nextlevel下一题 result进入结算
         self.playeranswerlist = [] # 记录用户单题作答情况
         self.wronganswerlist = [] # 如用户点错了把下标放在此列表中
+
+        self.mouse_sound = pygame.mixer.Sound("sounds/mouse.mp3")
+        self.mouse_sound.set_volume(0.8)
+        self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
+        self.correct_sound.set_volume(0.4)
+        self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
+        self.wrong_sound.set_volume(0.1)
         
         self.__createroles__()
         
@@ -118,8 +129,10 @@ class Select(object):
                     keyposy = keypos[1]
                     if keyposx > 370 and keyposx < 530 and keyposy > 580 and keyposy < 660:
                         if self.clickmode == "nextlevel":
+                            self.mouse_sound.play()
                             self.mode = "memory"
                         elif self.clickmode == "result":
+                            self.mouse_sound.play()
                             if self.temp_property == 1:
                                 self.iscomplete = 1
                             elif self.temp_property == 2:
@@ -134,10 +147,12 @@ class Select(object):
                                         self.playeranswerlist.append([keyindex[0], keyindex[1]])
                                         if len(self.playeranswerlist) == self.level:
                                             self.temp_property = 1
+                                            self.correct_sound.play()
                                     elif self.sprite_list[keyindex[0]][keyindex[1]].index != self.temp_random_index:
                                         # 如用户点错了
                                         self.wronganswerlist.append([keyindex[0], keyindex[1]])
                                         self.temp_property = 2
+                                        self.wrong_sound.play()
                     
             
     def __getmouseindex__(self, x, y):

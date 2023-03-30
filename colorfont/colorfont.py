@@ -8,6 +8,9 @@ from gameObject import *
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
+pygame.mixer.music.load("sounds/bgm.mp3")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(999)
 
 class ColorfontReady(object):
     # 准备界面
@@ -76,6 +79,13 @@ class ColorFont(object):
         self.fontlist = ["黑色", "白色", "红色", "绿色", "蓝色", "黄色", "粉色"]
         self.colorlist = ["#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"]
         self.propertylist = ["文字", "颜色"]
+
+        self.start_sound = pygame.mixer.Sound("sounds/start.mp3")
+        self.start_sound.set_volume(0.3)
+        self.correct_sound = pygame.mixer.Sound("sounds/correct.mp3")
+        self.correct_sound.set_volume(0.4)
+        self.wrong_sound = pygame.mixer.Sound("sounds/wrong.mp3")
+        self.wrong_sound.set_volume(0.1)
 
         self.__createroles__()
         
@@ -148,6 +158,7 @@ class ColorFont(object):
             return self.__setrandomitem__(property, lis) # 如果随机的相同，就递归重新随机
         
     def startGame(self):
+        self.start_sound.play()
         while True:
             self.clock.tick(60)
             self.__eventhandler__()
@@ -171,12 +182,16 @@ class ColorFont(object):
                         keypos = pygame.mouse.get_pos()
                         keyindex = self.__getmouseindex__(keypos[0], keypos[1])
                         if keyindex != None and self.temp_property == 0:
+                            if self.start_sound.play():
+                                self.start_sound.stop()
                             if keyindex == self.tempanswer:
                                 self.temp_property = 1
+                                self.correct_sound.play()
                                 self.end_answer_time = time.time()
                                 self.answer_time_list.append(self.end_answer_time - self.start_answer_time)
                             elif keyindex != self.tempanswer:
                                 self.temp_property = 2
+                                self.wrong_sound.play()
                             self.start_property_time = time.time()
                      
     def __getmouseindex__(self, x, y):
