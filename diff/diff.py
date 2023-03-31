@@ -171,8 +171,8 @@ class Diff(object):
                             keyindex = self.__gethoverindex__(keypos[0], keypos[1])
                             if keyindex != 0 and self.temp_property == 0:
                                 self.keycube = self.__gethovercube__(keypos[0], keypos[1])
-                            elif keyindex == 0:
-                                self.keycube = []
+                            # elif keyindex == 0:
+                            #     self.keycube = [] # 不能把keycube清空，否则点空地会报错
                             if keyindex != 0 and len(self.keycube) != 0:
                                     if self.start_sound.play():
                                         self.start_sound.stop()
@@ -241,6 +241,11 @@ class Diff(object):
                 wrongboard.show(0)
                 wrongboard.show(624)
                 
+                # 除了显示wrongboard还要把正确的魔方显示出来
+                realrightboard = Board(self.screen, [self.randx, self.randy], self.level, "right")
+                realrightboard.show(0)
+                realrightboard.show(624)
+                
                 self.screen.blit(pygame.transform.scale(pygame.image.load("images/wrong.png").convert_alpha(), (150, 110)), (600, 500))
                 
                 self.screen.blit(pygame.transform.scale(pygame.image.load("images/result.png").convert_alpha(), (160, 80)), (550, 700))
@@ -294,7 +299,7 @@ class Result(object):
         self.screen.fill("#808080")
         self.screen.blit(self.text1, (150, 150))
         self.screen.blit(self.text2, (150, 250))
-        self.screen.blit(pygame.image.load("images/restart.png").convert_alpha(), (500, 450))                
+        self.screen.blit(pygame.image.load("images/restart.png").convert_alpha(), (500, 450))
         
 def diffGame():
     # diff = Diff()
